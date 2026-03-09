@@ -21,16 +21,22 @@ export default function Home() {
   const signinEmailVerification =
     Boolean(signinEmail.includes("@") && signinEmail.trim());
 
+
   function signinPasswordVerification() {
     const hasNumber = Boolean(/\d/.test(signinPassword));
     const hasLetter = Boolean(/[a-zA-Z]/.test(signinPassword));
     const has8digists = Boolean(signinPassword.length >= 8);
+    const equalsToConfirmPassword = passwordsMatch();
 
     return Boolean(
       signinPassword.trim()
       && hasNumber
       && hasLetter
-      && has8digists);
+      && has8digists
+      && equalsToConfirmPassword);
+  }
+  function passwordsMatch() {
+    return signinPassword === signinConfirmPassword;
   }
 
   const canApply =
@@ -39,8 +45,7 @@ export default function Home() {
         signinName.trim() &&
         signinLastName.trim() &&
         signinEmailVerification &&
-        signinPasswordVerification() &&
-        signinConfirmPassword.trim(),
+        signinPasswordVerification()
       )
       : Boolean(loginEmail.trim() && loginPassword.trim());
 
@@ -62,10 +67,12 @@ export default function Home() {
     if (selectedMode === "signin") {
       if (!signinName.trim()) return "Preencha o nome.";
       if (!signinLastName.trim()) return "Preencha o sobrenome.";
-      if (!signinEmail.includes("@")) return "Digite um email valido"
       if (!signinEmail.trim()) return "Preencha o email.";
+      if (!signinEmail.includes("@")) return "Digite um email valido";
       if (!signinPassword.trim()) return "Preencha a senha.";
       if (!signinConfirmPassword.trim()) return "Confirme a senha.";
+      if (!passwordsMatch()) return "As senhas nao coincidem.";
+      if (!signinPasswordVerification()) return "Essa senha nao é valida, min 1 letra 1 numero e 8 caractere"
       return "";
     }
 
@@ -134,7 +141,7 @@ export default function Home() {
             />
           </div>
           <div>
-            <Brain canApply={canApply} onApply={handleApply} />
+            <Brain onApply={handleApply} />
           </div>
           {submitFeedback.type === "error" && (
             <p className="form-error">{submitFeedback.message}</p>
@@ -204,7 +211,7 @@ export default function Home() {
           />
         </div>
         <div>
-          <Brain canApply={canApply} onApply={handleApply} />
+          <Brain onApply={handleApply} />
         </div>
         {submitFeedback.type === "error" && (
           <p className="form-error">{submitFeedback.message}</p>
